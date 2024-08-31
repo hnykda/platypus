@@ -105,16 +105,15 @@ export function ActionBar({ projectId }: { projectId: string }) {
         <div className={classes.collections}>{collectionLinks}</div>
       </div>
       <div className="p-2">
-        <ScrollArea h={300} mt="md">
+        <Text size="lg" fw={500} mb="md">
+          Tasks
+        </Text>
+        <ScrollArea mt="md">
           {projectTasks.map((task) => (
             <Notification
               key={task.id}
               title={task.task_name}
               color={task.status === TaskStatus.PENDING ? "blue" : "green"}
-              withCloseButton
-              onClose={() => {
-                /* TODO: Implement task dismissal */
-              }}
               mb="xs"
             >
               Status: {task.status}
