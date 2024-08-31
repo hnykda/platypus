@@ -6,6 +6,15 @@ import path from "path";
 import { TaskFunctions, TaskName } from "./tasks";
 import { generateId } from "../utils";
 import { ProjectId, Project, Content, TaskStatus, Task } from "./types";
+import { Queue } from "bullmq";
+import { REDIS_HOST, REDIS_PORT } from "../constants";
+
+const alphaQueue = new Queue("alpha", {
+  connection: {
+    host: REDIS_HOST,
+    port: REDIS_PORT,
+  },
+});
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let db: any = null;
@@ -33,7 +42,11 @@ const initializeDb = async () => {
         task_name TEXT NOT NULL,
         func_args TEXT NOT NULL,
         status TEXT NOT NULL,
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        error TEXT DEFAULT '',
+        result TEXT DEFAULT '',
+        finished_at TEXT DEFAULT '',
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
       )
     `);
   }
@@ -113,17 +126,51 @@ export async function spawnTask<T extends TaskName>(
   projectId: ProjectId,
   taskName: T,
   funcArgs: Parameters<TaskFunctions[T]>
-): Promise<{ spawned: true }> {
+): Promise<{ spawned: true; taskId: string }> {
   const taskId = generateId();
   createDbTask(taskId, projectId, taskName, funcArgs);
-  // submits to the task queue via task registry func
-  // const task = TaskRegistry[taskName];
-  return { spawned: true };
+  await alphaQueue.add(
+    taskName,
+    {
+      args: funcArgs,
+    },
+    {
+      jobId: taskId,
+    }
+  );
+  return { spawned: true, taskId };
 }
 
 // a separate process takes these tasks from the queue, runs them, and then updates the status in the database
 
 export async function getTasks(projectId: ProjectId): Promise<Task[]> {
   db = await getDb();
-  return db.all("SELECT * FROM tasks WHERE project_id = ?", projectId);
+  return db.all(
+    "SELECT * FROM tasks WHERE project_id = ? ORDER BY created_at DESC",
+    projectId
+  );
+}
+
+export async function updateTask({
+  taskId,
+  status,
+  error,
+  result,
+  finishedAt,
+}: {
+  taskId: string;
+  status: TaskStatus;
+  error: string;
+  result: string;
+  finishedAt: string;
+}): Promise<void> {
+  db = await getDb();
+  await db.run(
+    "UPDATE tasks SET status = ?, error = ?, result = ?, finished_at = ? WHERE id = ?",
+    status,
+    error,
+    result,
+    finishedAt,
+    taskId
+  );
 }

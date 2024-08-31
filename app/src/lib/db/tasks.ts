@@ -10,25 +10,30 @@ const sleepTime = 4000;
 const sleep = async () => {
   await new Promise((resolve) => setTimeout(resolve, sleepTime));
 };
-const validateQuestion = async (question: string) => {
+const validateQuestion = async ({ question }: { question: string }) => {
   await sleep();
 
   return {
     success: true,
   };
 };
-const classifyQuestion = async (question: string) => {
+const classifyQuestion = async ({ question }: { question: string }) => {
   await sleep();
-
   return {
     quantified: true,
     actor: false,
   };
 };
 
-export const improveQuestion = async ({ question }: { question: string }) => {
+export const improveQuestion = async ({
+  question,
+  otherArg,
+}: {
+  question: string;
+  otherArg: string;
+}) => {
+  console.log("running IMPROVE QUESTION", question, otherArg);
   await sleep();
-
   return {
     alternatives: [
       `WTF ${question} ???`,

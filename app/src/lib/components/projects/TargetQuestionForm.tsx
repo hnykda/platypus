@@ -28,7 +28,9 @@ const TargetQuestionForm: React.FC<TargetQuestionFormProps> = ({
   }, [content.targetQuestion]);
 
   const spawnPostQuestionProcessing = () => {
-    spawnTask(TaskNames.IMPROVE_QUESTION, [{ question: targetQuestion }]);
+    spawnTask(TaskNames.IMPROVE_QUESTION, [
+      { question: targetQuestion, otherArg: "otherArg" },
+    ]);
     notifications.show({
       title: "Checking if we can improve the question",
       message: "We will let you know if we can improve the question.",
