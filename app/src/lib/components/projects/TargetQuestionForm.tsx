@@ -1,7 +1,8 @@
 import { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { Button, Modal, TextInput } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { Content, ProjectId, spawnTask } from "@/lib/db/main";
+import { spawnTask } from "@/lib/db/main";
+import { Content, ProjectId } from "@/lib/db/types";
 import { notifications } from "@mantine/notifications";
 import { TaskNames } from "@/lib/db/tasks";
 

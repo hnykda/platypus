@@ -1,6 +1,7 @@
 "use server";
 
-import { createProject, getProject, getProjects, ProjectId } from "../db/main";
+import { createProject, getProject, getProjects } from "../db/main";
+import { ProjectId } from "../db/types";
 
 export async function createProjectAction(id: ProjectId) {
   return createProject(id);

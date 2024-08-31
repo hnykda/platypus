@@ -5,22 +5,10 @@ import fs from "fs";
 import path from "path";
 import { TaskFunctions, TaskName } from "./tasks";
 import { generateId } from "../utils";
+import { ProjectId, Project, Content, TaskStatus } from "./types";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let db: any = null;
-
-export type ProjectId = string;
-
-export type Content = {
-  targetQuestion: string;
-};
-
-export type Project = {
-  id: ProjectId;
-  name: string;
-  created_at: string;
-  content: Content;
-};
 
 const dbPath = path.join(process.cwd(), "platypus.db");
 
@@ -44,6 +32,7 @@ const initializeDb = async () => {
         project_id TEXT NOT NULL,
         task_name TEXT NOT NULL,
         func_args TEXT NOT NULL,
+        status TEXT NOT NULL,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
       )
     `);
@@ -111,11 +100,12 @@ async function createDbTask<T extends TaskName>(
   funcArgs: Parameters<TaskFunctions[T]>
 ) {
   await db.run(
-    "INSERT INTO tasks (id, project_id, task_name, func_args) VALUES (?, ?, ?, ?)",
+    "INSERT INTO tasks (id, project_id, task_name, func_args, status) VALUES (?, ?, ?, ?, ?)",
     taskId,
     projectId,
     taskName,
-    JSON.stringify(funcArgs)
+    JSON.stringify(funcArgs),
+    TaskStatus.PENDING
   );
 }
 
@@ -130,3 +120,5 @@ export async function spawnTask<T extends TaskName>(
   // const task = TaskRegistry[taskName];
   return { spawned: true };
 }
+
+// a separate process takes these tasks from the queue, runs them, and then updates the status in the database
