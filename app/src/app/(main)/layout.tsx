@@ -1,6 +1,5 @@
 "use client";
 
-import { ActionBar } from "@/lib/components/ActionBar/ActionBar";
 import { Navbar } from "@/lib/components/Navbar/Navbar";
 import {
   AppShell,

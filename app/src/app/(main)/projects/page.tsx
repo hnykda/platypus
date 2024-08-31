@@ -2,7 +2,6 @@
 
 import DefaultPage from "@/lib/components/DefaultPage";
 import { Button } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
 
 const mockedProjects = [

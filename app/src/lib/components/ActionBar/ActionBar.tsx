@@ -8,7 +8,6 @@ import {
   ActionIcon,
   Tooltip,
   rem,
-  Button,
 } from "@mantine/core";
 import {
   IconBulb,

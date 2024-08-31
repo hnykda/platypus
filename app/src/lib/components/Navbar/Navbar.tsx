@@ -1,13 +1,8 @@
-import { useState } from "react";
-import { Center, Tooltip, UnstyledButton, Stack, rem } from "@mantine/core";
+import { Tooltip, UnstyledButton, Stack, rem } from "@mantine/core";
 import {
   IconHome2,
   IconGauge,
   IconDeviceDesktopAnalytics,
-  IconFingerprint,
-  IconCalendarStats,
-  IconUser,
-  IconSettings,
   IconLogout,
   IconSwitchHorizontal,
 } from "@tabler/icons-react";
@@ -46,7 +41,7 @@ const mockdata = [
 ];
 
 export function Navbar() {
-  const links = mockdata.map((link, index) => (
+  const links = mockdata.map((link) => (
     <NavbarLink {...link} key={link.label} href={link.href} />
   ));
 
