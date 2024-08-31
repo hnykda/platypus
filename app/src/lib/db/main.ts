@@ -9,13 +9,6 @@ import { ProjectId, Project, Content, TaskStatus, Task } from "./types";
 import { Queue } from "bullmq";
 import { REDIS_HOST, REDIS_PORT } from "../constants";
 
-const alphaQueue = new Queue("alpha", {
-  connection: {
-    host: REDIS_HOST,
-    port: REDIS_PORT,
-  },
-});
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let db: any = null;
 
@@ -129,6 +122,14 @@ export async function spawnTask<T extends TaskName>(
 ): Promise<{ spawned: true; taskId: string }> {
   const taskId = generateId();
   createDbTask(taskId, projectId, taskName, funcArgs);
+
+  const alphaQueue = new Queue("alpha", {
+    connection: {
+      host: REDIS_HOST,
+      port: REDIS_PORT,
+    },
+  });
+
   await alphaQueue.add(
     taskName,
     {

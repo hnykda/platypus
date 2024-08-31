@@ -1,0 +1,23 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: cache
+    expose:
+      - 6379
+    ports:
+      - 6379:6379
+  worker:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: worker
+    command: npx nodemon --watch src -e ts,tsx --exec "tsx" ./src/lib/worker.ts
+    volumes:
+      - ./app:/app
+      # Prevent node_modules from being included, we must use the image's node_modules
+      - /app/node_modules
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - redis

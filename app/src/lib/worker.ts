@@ -29,6 +29,14 @@ const worker = new Worker(
       host: REDIS_HOST,
       port: REDIS_PORT,
     },
+    removeOnComplete: {
+      age: 24 * 3600, // keep up to 24 hours
+      count: 1000, // keep up to 1000 jobs
+    },
+    removeOnFail: {
+      age: 24 * 3600, // keep up to 24 hours
+      count: 1000, // keep up to 1000 jobs
+    },
   }
 );
 
