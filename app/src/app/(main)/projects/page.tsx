@@ -1,8 +1,7 @@
 "use client";
 
-import { ActionBar } from "@/lib/components/ActionBar/ActionBar";
-import { Navbar } from "@/lib/components/Navbar/Navbar";
-import { AppShell, Burger, Button } from "@mantine/core";
+import DefaultPage from "@/lib/components/DefaultPage";
+import { Button } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
 
@@ -15,7 +14,7 @@ const mockedProjects = [
 export default function ProjectsIndexPage() {
   return (
     <>
-      <AppShell.Main>
+      <DefaultPage>
         <div className="flex flex-col gap-4 text-3xl">
           {mockedProjects.map((project) => (
             <Link href={`/projects/${project.id}`} key={project.id}>
@@ -23,7 +22,7 @@ export default function ProjectsIndexPage() {
             </Link>
           ))}
         </div>
-      </AppShell.Main>
+      </DefaultPage>
     </>
   );
 }

@@ -2,7 +2,12 @@
 
 import { ActionBar } from "@/lib/components/ActionBar/ActionBar";
 import { Navbar } from "@/lib/components/Navbar/Navbar";
-import { AppShell, Burger } from "@mantine/core";
+import {
+  AppShell,
+  Burger,
+  AppShellHeader,
+  AppShellNavbar,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
 export default function AppShellLayout({
@@ -22,14 +27,14 @@ export default function AppShellLayout({
       }}
       padding="md"
     >
-      <AppShell.Header>
+      <AppShellHeader>
         <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
         <div>Logo</div>
-      </AppShell.Header>
+      </AppShellHeader>
 
-      <AppShell.Navbar>
+      <AppShellNavbar>
         <Navbar />
-      </AppShell.Navbar>
+      </AppShellNavbar>
 
       {children}
     </AppShell>
