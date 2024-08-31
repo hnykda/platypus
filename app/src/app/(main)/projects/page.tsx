@@ -1,27 +1,16 @@
-"use client";
-
+import { getProjectsAction } from "@/lib/actions/actions";
 import DefaultPage from "@/lib/components/DefaultPage";
-import { Button } from "@mantine/core";
-import Link from "next/link";
+import ProjectsIndex from "@/lib/components/projects/ProjectsIndex";
+import { Suspense } from "react";
 
-const mockedProjects = [
-  { id: "1", name: "Project 1" },
-  { id: "2", name: "Project 2" },
-  { id: "3", name: "Project 3" },
-];
+export default async function ProjectsIndexPage() {
+  const projectsPromise = getProjectsAction();
 
-export default function ProjectsIndexPage() {
   return (
-    <>
-      <DefaultPage>
-        <div className="flex flex-col gap-4 text-3xl">
-          {mockedProjects.map((project) => (
-            <Link href={`/projects/${project.id}`} key={project.id}>
-              <Button>{project.name}</Button>
-            </Link>
-          ))}
-        </div>
-      </DefaultPage>
-    </>
+    <DefaultPage>
+      <Suspense fallback={<div>Loading projects...</div>}>
+        <ProjectsIndex projectsPromise={projectsPromise} />
+      </Suspense>
+    </DefaultPage>
   );
 }
