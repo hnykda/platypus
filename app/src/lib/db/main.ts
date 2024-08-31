@@ -9,11 +9,15 @@ let db: any = null;
 
 export type ProjectId = string;
 
+export type Content = {
+  targetQuestion: string;
+};
+
 export type Project = {
   id: ProjectId;
   name: string;
   created_at: string;
-  content: string;
+  content: Content;
 };
 
 const dbPath = path.join(process.cwd(), "platypus.db");
@@ -30,7 +34,7 @@ const initializeDb = async () => {
         id TEXT PRIMARY KEY,
         name TEXT DEFAULT '',
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-        content TEXT DEFAULT ''
+        content TEXT DEFAULT '{}'
       )
     `);
   }
@@ -64,14 +68,18 @@ export async function getProjects(): Promise<Project[]> {
 
 export async function getProject(id: ProjectId): Promise<Project | null> {
   db = await getDb();
-  return db.get("SELECT * FROM projects WHERE id = ?", id);
+  const rawRecord = await db.get("SELECT * FROM projects WHERE id = ?", id);
+  return {
+    ...rawRecord,
+    content: JSON.parse(rawRecord.content) as Content,
+  };
 }
 
 export async function updateProject(
   id: ProjectId,
   name: string,
   content: string
-): Promise<Project | null> {
+): Promise<void> {
   db = await getDb();
   await db.run(
     "UPDATE projects SET name = ?, content = ? WHERE id = ?",
@@ -79,7 +87,6 @@ export async function updateProject(
     content,
     id
   );
-  return await getProject(id);
 }
 
 export async function deleteProject(id: ProjectId) {

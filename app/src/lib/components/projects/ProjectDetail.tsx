@@ -1,7 +1,7 @@
 "use client";
 
 import { getProjectAction } from "@/lib/actions/actions";
-import { use } from "react";
+import { use, useState } from "react";
 
 const ProjectDetail = ({
   projectPromise,
@@ -9,16 +9,32 @@ const ProjectDetail = ({
   projectPromise: ReturnType<typeof getProjectAction>;
 }) => {
   const project = use(projectPromise);
+
   if (!project) {
     return <div>Project not found</div>;
   }
 
+  // in the future, please let this not to be the CRAZY HUGE JSON BLOB HOLDING EVERYTHING
+  const [content, setContent] = useState(project.content);
+
+  if (!content.targetQuestion) {
+    return 
+  }
+
   return (
-    <div>
-      <div>id: {project.id}</div>
-      <div>name: {project.name}</div>
-      <div>content: {project.content}</div>
-      <div>created_at: {project.created_at}</div>
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-row gap-4">
+        <div className="bg-gray-100 p-4 rounded-md">id: {project.id}</div>
+        <div className="bg-gray-100 p-4 rounded-md">name: {project.name}</div>
+        <div className="bg-gray-100 p-4 rounded-md">
+          created_at: {project.created_at}
+        </div>
+      </div>
+      <div></div>
+      <span>Content</span>
+      <pre className="bg-gray-100 p-4 rounded-md">
+        {JSON.stringify(project.content, null, 2)}
+      </pre>
     </div>
   );
 };
