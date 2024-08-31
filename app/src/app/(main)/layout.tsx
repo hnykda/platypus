@@ -5,14 +5,18 @@ import { Navbar } from "@/lib/components/Navbar/Navbar";
 import { AppShell, Burger } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
-export default function Home() {
+export default function AppShellLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [opened, { toggle }] = useDisclosure();
 
   return (
     <AppShell
       header={{ height: 60 }}
       navbar={{
-        width: "auto",
+        width: 50,
         breakpoint: "sm",
         collapsed: { mobile: !opened },
       }}
@@ -27,10 +31,7 @@ export default function Home() {
         <Navbar />
       </AppShell.Navbar>
 
-      <AppShell.Main>Main</AppShell.Main>
-      <AppShell.Aside>
-        <ActionBar />
-      </AppShell.Aside>
+      {children}
     </AppShell>
   );
 }

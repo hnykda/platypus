@@ -12,44 +12,42 @@ import {
   IconSwitchHorizontal,
 } from "@tabler/icons-react";
 import classes from "./Navbar.module.css";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 interface NavbarLinkProps {
   icon: typeof IconHome2;
   label: string;
-  active?: boolean;
-  onClick?(): void;
+  href: string;
 }
 
-function NavbarLink({ icon: Icon, label, active, onClick }: NavbarLinkProps) {
+function NavbarLink({ icon: Icon, label, href }: NavbarLinkProps) {
+  const pathname = usePathname();
+  const active = pathname === href;
+
   return (
     <Tooltip label={label} position="right" transitionProps={{ duration: 0 }}>
-      <UnstyledButton
-        onClick={onClick}
-        className={classes.link}
-        data-active={active || undefined}
-      >
-        <Icon style={{ width: rem(20), height: rem(20) }} stroke={1.5} />
-      </UnstyledButton>
+      <Link href={href}>
+        <UnstyledButton
+          className={classes.link}
+          data-active={active || undefined}
+        >
+          <Icon style={{ width: rem(20), height: rem(20) }} stroke={1.5} />
+        </UnstyledButton>
+      </Link>
     </Tooltip>
   );
 }
 
 const mockdata = [
-  { icon: IconHome2, label: "Home" },
-  { icon: IconGauge, label: "Projects" },
-  { icon: IconDeviceDesktopAnalytics, label: "Analytics" },
+  { icon: IconHome2, label: "Home", href: "/" },
+  { icon: IconGauge, label: "Projects", href: "/projects" },
+  { icon: IconDeviceDesktopAnalytics, label: "Analytics", href: "/analytics" },
 ];
 
 export function Navbar() {
-  const [active, setActive] = useState(2);
-
   const links = mockdata.map((link, index) => (
-    <NavbarLink
-      {...link}
-      key={link.label}
-      active={index === active}
-      onClick={() => setActive(index)}
-    />
+    <NavbarLink {...link} key={link.label} href={link.href} />
   ));
 
   return (
@@ -61,8 +59,12 @@ export function Navbar() {
       </div>
 
       <Stack justify="center" gap={0}>
-        <NavbarLink icon={IconSwitchHorizontal} label="Change account" />
-        <NavbarLink icon={IconLogout} label="Logout" />
+        <NavbarLink
+          icon={IconSwitchHorizontal}
+          label="Change account"
+          href="/"
+        />
+        <NavbarLink icon={IconLogout} label="Logout" href="/" />
       </Stack>
     </>
   );
