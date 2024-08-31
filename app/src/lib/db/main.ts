@@ -5,7 +5,7 @@ import fs from "fs";
 import path from "path";
 import { TaskFunctions, TaskName } from "./tasks";
 import { generateId } from "../utils";
-import { ProjectId, Project, Content, TaskStatus } from "./types";
+import { ProjectId, Project, Content, TaskStatus, Task } from "./types";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let db: any = null;
@@ -122,3 +122,8 @@ export async function spawnTask<T extends TaskName>(
 }
 
 // a separate process takes these tasks from the queue, runs them, and then updates the status in the database
+
+export async function getTasks(projectId: ProjectId): Promise<Task[]> {
+  db = await getDb();
+  return db.all("SELECT * FROM tasks WHERE project_id = ?", projectId);
+}

@@ -1,3 +1,4 @@
+import { TaskName } from "./tasks";
 
 export type ProjectId = string;
 
@@ -16,5 +17,13 @@ export enum TaskStatus {
   PENDING = "pending",
   IN_PROGRESS = "in_progress",
   COMPLETED = "completed",
-  FAILED = "failed"
+  FAILED = "failed",
 }
+
+export type Task = {
+  id: string;
+  project_id: ProjectId;
+  task_name: TaskName;
+  func_args: string;
+  status: TaskStatus;
+};

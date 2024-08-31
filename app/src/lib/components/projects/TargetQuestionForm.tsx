@@ -1,10 +1,10 @@
 import { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { Button, Modal, TextInput } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { spawnTask } from "@/lib/db/main";
 import { Content, ProjectId } from "@/lib/db/types";
 import { notifications } from "@mantine/notifications";
 import { TaskNames } from "@/lib/db/tasks";
+import { useTasks } from "@/lib/hooks/useTasks";
 
 interface TargetQuestionFormProps {
   projectId: ProjectId;
@@ -19,6 +19,7 @@ const TargetQuestionForm: React.FC<TargetQuestionFormProps> = ({
 }) => {
   const [opened, { open, close }] = useDisclosure(false);
   const [targetQuestion, setTargetQuestion] = useState(content.targetQuestion);
+  const { spawnTask } = useTasks(projectId);
 
   useEffect(() => {
     if (content.targetQuestion === null) {
@@ -27,9 +28,7 @@ const TargetQuestionForm: React.FC<TargetQuestionFormProps> = ({
   }, [content.targetQuestion]);
 
   const spawnPostQuestionProcessing = () => {
-    spawnTask(projectId, TaskNames.IMPROVE_QUESTION, [
-      { question: targetQuestion },
-    ]);
+    spawnTask(TaskNames.IMPROVE_QUESTION, [{ question: targetQuestion }]);
     notifications.show({
       title: "Checking if we can improve the question",
       message: "We will let you know if we can improve the question.",

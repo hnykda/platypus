@@ -10,6 +10,8 @@ import {
   ActionIcon,
   Tooltip,
   rem,
+  Notification,
+  ScrollArea,
 } from "@mantine/core";
 import {
   IconBulb,
@@ -19,6 +21,8 @@ import {
   IconPlus,
 } from "@tabler/icons-react";
 import classes from "./ActionBar.module.css";
+import { TaskStatus } from "@/lib/db/types";
+import { useTasks } from "@/lib/hooks/useTasks";
 
 const links = [
   { icon: IconBulb, label: "Activity", notifications: 3 },
@@ -32,7 +36,9 @@ const collections = [
   { emoji: "💸", label: "Discounts" },
 ];
 
-export function ActionBar() {
+export function ActionBar({ projectId }: { projectId: string }) {
+  const { projectTasks } = useTasks(projectId);
+
   const mainLinks = links.map((link) => (
     <UnstyledButton key={link.label} className={classes.mainLink}>
       <div className={classes.mainLinkInner}>
@@ -97,6 +103,24 @@ export function ActionBar() {
           </Tooltip>
         </Group>
         <div className={classes.collections}>{collectionLinks}</div>
+      </div>
+      <div className="p-2">
+        <ScrollArea h={300} mt="md">
+          {projectTasks.map((task) => (
+            <Notification
+              key={task.id}
+              title={task.task_name}
+              color={task.status === TaskStatus.PENDING ? "blue" : "green"}
+              withCloseButton
+              onClose={() => {
+                /* TODO: Implement task dismissal */
+              }}
+              mb="xs"
+            >
+              Status: {task.status}
+            </Notification>
+          ))}
+        </ScrollArea>
       </div>
     </>
   );

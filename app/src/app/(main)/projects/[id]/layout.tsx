@@ -4,14 +4,17 @@ import DefaultPage from "@/lib/components/DefaultPage";
 
 export default function ProjectLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: { id: string };
 }) {
+  const { id } = params;
   return (
     <>
       <DefaultPage>{children}</DefaultPage>
       <Aside>
-        <ActionBar />
+        <ActionBar projectId={id} />
       </Aside>
     </>
   );
