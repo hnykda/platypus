@@ -3,6 +3,8 @@ import sqlite3 from "sqlite3";
 import { open } from "sqlite";
 import fs from "fs";
 import path from "path";
+import { TaskFunctions, TaskName } from "./tasks";
+import { generateId } from "../utils";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let db: any = null;
@@ -35,6 +37,14 @@ const initializeDb = async () => {
         name TEXT DEFAULT '',
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         content TEXT DEFAULT '{}'
+      )
+
+      CREATE TABLE IF NOT EXISTS tasks (
+        id TEXT PRIMARY KEY,
+        project_id TEXT NOT NULL,
+        task_name TEXT NOT NULL,
+        func_args TEXT NOT NULL,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
       )
     `);
   }
@@ -92,4 +102,31 @@ export async function updateProject(
 export async function deleteProject(id: ProjectId) {
   db = await getDb();
   await db.run("DELETE FROM projects WHERE id = ?", id);
+}
+
+async function createDbTask<T extends TaskName>(
+  taskId: string,
+  projectId: ProjectId,
+  taskName: T,
+  funcArgs: Parameters<TaskFunctions[T]>
+) {
+  await db.run(
+    "INSERT INTO tasks (id, project_id, task_name, func_args) VALUES (?, ?, ?, ?)",
+    taskId,
+    projectId,
+    taskName,
+    JSON.stringify(funcArgs)
+  );
+}
+
+export async function spawnTask<T extends TaskName>(
+  projectId: ProjectId,
+  taskName: T,
+  funcArgs: Parameters<TaskFunctions[T]>
+): Promise<{ spawned: true }> {
+  const taskId = generateId();
+  createDbTask(taskId, projectId, taskName, funcArgs);
+  // submits to the task queue via task registry func
+  // const task = TaskRegistry[taskName];
+  return { spawned: true };
 }

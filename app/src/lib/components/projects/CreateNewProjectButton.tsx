@@ -1,7 +1,7 @@
 "use client";
 
 import { createProjectAction } from "@/lib/actions/actions";
-import { generateId } from "@/lib/utils";
+import { generateHumanId } from "@/lib/utils";
 import { Button } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
@@ -18,7 +18,7 @@ export default function CreateNewProjectButton() {
       loading={isLoading}
       onClick={() => {
         setIsLoading(true);
-        const generatedId = generateId();
+        const generatedId = generateHumanId();
         createProjectAction(generatedId);
         router.push(`/projects/${generatedId}`);
         setIsLoading(false);

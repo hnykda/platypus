@@ -2,6 +2,7 @@
 
 import { getProjectAction } from "@/lib/actions/actions";
 import { use, useState } from "react";
+import TargetQuestionForm from "./TargetQuestionForm";
 
 const ProjectDetail = ({
   projectPromise,
@@ -14,12 +15,7 @@ const ProjectDetail = ({
     return <div>Project not found</div>;
   }
 
-  // in the future, please let this not to be the CRAZY HUGE JSON BLOB HOLDING EVERYTHING
   const [content, setContent] = useState(project.content);
-
-  if (!content.targetQuestion) {
-    return 
-  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -30,10 +26,14 @@ const ProjectDetail = ({
           created_at: {project.created_at}
         </div>
       </div>
-      <div></div>
+      <TargetQuestionForm
+        projectId={project.id}
+        content={content}
+        setContent={setContent}
+      />
       <span>Content</span>
       <pre className="bg-gray-100 p-4 rounded-md">
-        {JSON.stringify(project.content, null, 2)}
+        {JSON.stringify(content, null, 2)}
       </pre>
     </div>
   );

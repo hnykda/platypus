@@ -11,8 +11,11 @@
   "dependencies": {
     "@mantine/core": "^7.12.2",
     "@mantine/hooks": "^7.12.2",
+    "@mantine/modals": "^7.12.2",
+    "@mantine/notifications": "^7.12.2",
     "@tabler/icons-react": "^3.14.0",
     "human-id": "^4.1.1",
+    "nanoid": "^5.0.7",
     "next": "^14",
     "react": "^18",
     "react-dom": "^18",
