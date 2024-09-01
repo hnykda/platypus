@@ -10,6 +10,7 @@ services:
     build:
       context: ./app
       dockerfile: Dockerfile
+      target: prod-deps
     container_name: worker
     command: npx nodemon --watch src -e ts,tsx --exec "tsx" ./src/lib/worker.ts
     volumes:
@@ -21,3 +22,16 @@ services:
       - REDIS_PORT=6379
     depends_on:
       - redis
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+      target: prod
+    container_name: app
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    expose:
+      - 3000
+    ports:
+      - 3000:3000

@@ -9,8 +9,8 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { ModalsProvider } from "@mantine/modals";
-import { TestModal } from "../../lib/components/EvidenceModal.tsx";
 import { TaskNames } from "@/lib/db/tasks";
+import { EvidenceModal } from "@/lib/components/EvidenceModal";
 
 export default function AppShellLayout({
   children,
@@ -20,7 +20,7 @@ export default function AppShellLayout({
   const [opened, { toggle }] = useDisclosure();
 
   return (
-    <ModalsProvider modals={{ [TaskNames.SEARCH_FOR_EVIDENCE]: TestModal }}>
+    <ModalsProvider modals={{ [TaskNames.SEARCH_FOR_EVIDENCE]: EvidenceModal }}>
       <AppShell
         header={{ height: 60 }}
         navbar={{

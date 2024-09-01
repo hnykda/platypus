@@ -6,7 +6,7 @@ export function getTasksQueryOptions(id: ProjectId) {
   return queryOptions({
     queryKey: ["tasks", id],
     queryFn: () => getProjectTasksAction(id),
-    staleTime: 5 * 1000,
+    refetchInterval: 5 * 1000,
   });
 }
 

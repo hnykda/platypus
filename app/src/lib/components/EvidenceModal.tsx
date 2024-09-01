@@ -4,7 +4,7 @@ import { Button, Text, Switch, List } from "@mantine/core";
 import { ContextModalProps } from "@mantine/modals";
 import { useState } from "react";
 
-export const TestModal = ({
+export const EvidenceModal = ({
   context,
   id,
   innerProps,
