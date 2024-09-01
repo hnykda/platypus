@@ -4,9 +4,6 @@ import {
   TextInput,
   Code,
   UnstyledButton,
-  Badge,
-
-  
   Text,
   rem,
   Notification,
