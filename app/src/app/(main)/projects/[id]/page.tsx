@@ -1,12 +1,26 @@
 import { getProjectAction } from "@/lib/actions/actions";
 import ProjectDetail from "@/lib/components/projects/ProjectDetail";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
 
-export default function ProjectPage({
+export default async function ProjectPage({
   params: { id },
 }: {
   params: { id: string };
 }) {
-  const projectPromise = getProjectAction(id);
+  const queryClient = new QueryClient();
 
-  return <ProjectDetail projectPromise={projectPromise} />;
+  await queryClient.prefetchQuery({
+    queryKey: ["project", id],
+    queryFn: () => getProjectAction(id),
+  });
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <ProjectDetail projectId={id} />
+    </HydrationBoundary>
+  );
 }

@@ -1,22 +1,51 @@
-import { useState, useEffect, Dispatch, SetStateAction } from "react";
+import { useState, useEffect } from "react";
 import { Button, Modal, TextInput } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { Content, ProjectId } from "@/lib/db/types";
+import { Project, ProjectId } from "@/lib/db/types";
 import { notifications } from "@mantine/notifications";
 import { TaskNames } from "@/lib/db/tasks";
 import { useTasks } from "@/lib/hooks/useTasks";
+import { getProjectAction, updateProjectAction } from "@/lib/actions/actions";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 interface TargetQuestionFormProps {
   projectId: ProjectId;
-  content: Content;
-  setContent: Dispatch<SetStateAction<Content>>;
 }
 
 const TargetQuestionForm: React.FC<TargetQuestionFormProps> = ({
   projectId,
-  content,
-  setContent,
 }) => {
+  const { data: project } = useQuery({
+    queryKey: ["project", projectId],
+    queryFn: () => getProjectAction(projectId),
+  });
+
+  const updateProjectMutation = useMutation({
+    mutationFn: (data: Partial<Project>) =>
+      updateProjectAction(projectId, data),
+    onSuccess: () => {
+      notifications.show({
+        title: "Project data updated",
+        message: "Your project data has been updated.",
+      });
+    },
+    onError: (error) => {
+      notifications.show({
+        title: "Error updating project data",
+        message:
+          "There was an error updating your project data. Error: " +
+          error.message,
+        color: "red",
+      });
+    },
+  });
+
+  if (!project) {
+    return null;
+  }
+
+  const content = project.content;
+
   const [opened, { open, close }] = useDisclosure(false);
   const [targetQuestion, setTargetQuestion] = useState(content.targetQuestion);
   const { spawnTask } = useTasks(projectId);
@@ -45,26 +74,23 @@ const TargetQuestionForm: React.FC<TargetQuestionFormProps> = ({
   };
 
   const handleSubmit = (question: string) => {
-    setContent((prevContent) => {
-      const newContent = {
-        ...prevContent,
+    updateProjectMutation.mutate({
+      content: {
+        ...content,
         targetQuestion: question,
-      };
-      return newContent;
+      },
     });
     close();
-    notifications.show({
-      title: "Target Question Updated",
-      message: "Your target question has been updated.",
-    });
     spawnPostQuestionProcessing();
   };
 
   const handleCancel = () => {
-    setContent((prevContent) => ({
-      ...prevContent,
-      targetQuestion: "",
-    }));
+    updateProjectMutation.mutate({
+      content: {
+        ...content,
+        targetQuestion: "",
+      },
+    });
     close();
   };
 
@@ -89,8 +115,10 @@ const TargetQuestionForm: React.FC<TargetQuestionFormProps> = ({
             }
           }}
         />
-        <Button onClick={() => handleSubmit(targetQuestion)}>Submit</Button>
-        <Button onClick={handleCancel}>Cancel</Button>
+        <div className="flex gap-2">
+          <Button onClick={() => handleSubmit(targetQuestion)}>Submit</Button>
+          <Button onClick={handleCancel}>Cancel</Button>
+        </div>
       </Modal>
     </div>
   );

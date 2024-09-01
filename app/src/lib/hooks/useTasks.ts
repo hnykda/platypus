@@ -1,52 +1,45 @@
-import { useState, useEffect } from "react";
 import {
   deleteAllTasks as deleteAllTasksDb,
-  getTasks,
   spawnTask as spawnTaskDb,
 } from "@/lib/db/main";
 import { TaskName, TaskFunctions } from "@/lib/db/tasks";
-import { ProjectId, Task, TaskStatus } from "@/lib/db/types";
+import { ProjectId } from "@/lib/db/types";
 import { generateId } from "../utils";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useTasks(projectId: ProjectId) {
-  const [projectTasks, setProjectTasks] = useState<Task[]>([]);
+  const queryClient = useQueryClient();
 
-  const fetchTasks = async () => {
-    const tasks = await getTasks(projectId);
-    setProjectTasks(tasks);
-  };
+  const addNewTaskMutation = useMutation({
+    mutationFn: async ({
+      taskName,
+      funcArgs,
+    }: {
+      taskName: TaskName;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      funcArgs: any[];
+    }) => {
+      const newTaskId = generateId();
+      await spawnTaskDb(newTaskId, projectId, taskName, funcArgs);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks", projectId] });
+    },
+  });
 
-  useEffect(() => {
-    fetchTasks();
-    // Set up polling to refresh tasks periodically
-    const intervalId = setInterval(fetchTasks, 5000);
-    return () => clearInterval(intervalId);
-  }, [projectId]);
+  const deleteAllTasksMutation = useMutation({
+    mutationFn: () => deleteAllTasksDb(projectId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks", projectId] });
+    },
+  });
 
   const spawnTask = async <T extends TaskName>(
     taskName: T,
     funcArgs: Parameters<TaskFunctions[T]>
   ) => {
-    const newTaskId = generateId();
-    // optimistic update
-    setProjectTasks((prevTasks) => [
-      {
-        id: newTaskId,
-        task_name: taskName,
-        status: TaskStatus.PENDING,
-        project_id: projectId,
-        func_args: "",
-      },
-      ...prevTasks,
-    ]);
-    await spawnTaskDb(newTaskId, projectId, taskName, funcArgs);
-    fetchTasks();
+    addNewTaskMutation.mutate({ taskName, funcArgs });
   };
 
-  const deleteAllTasks = async () => {
-    setProjectTasks([]);
-    await deleteAllTasksDb(projectId);
-  };
-
-  return { projectTasks, spawnTask, deleteAllTasks };
+  return { spawnTask, deleteAllTasks: deleteAllTasksMutation.mutate };
 }

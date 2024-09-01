@@ -86,23 +86,24 @@ export async function getProject(id: ProjectId): Promise<Project | null> {
 
 export async function updateProject(
   id: ProjectId,
-  name: string,
-  content: string
+  data: Partial<Project>
 ): Promise<void> {
   db = await getDb();
-  await db.run(
-    "UPDATE projects SET name = ?, content = ? WHERE id = ?",
-    name,
-    content,
-    id
-  );
+  const fields = Object.keys(data).filter((key) => key !== "id");
+  const setClause = fields.map((field) => `${field} = ?`).join(", ");
+  const values = fields.map((field) => {
+    if (field === "content") {
+      return JSON.stringify(data[field]);
+    }
+    return data[field as keyof Partial<Project>];
+  });
+
+  await db.run(`UPDATE projects SET ${setClause} WHERE id = ?`, ...values, id);
 }
 
 export async function deleteProject(id: ProjectId) {
   db = await getDb();
   await db.run("DELETE FROM projects WHERE id = ?", id);
-  revalidatePath("/projects");
-  revalidatePath(`/projects/${id}`);
 }
 
 async function createDbTask<T extends TaskName>(
@@ -145,6 +146,7 @@ export async function spawnTask<T extends TaskName>(
       jobId: taskId,
     }
   );
+  revalidatePath(`/projects/${projectId}`);
   return { spawned: true, taskId };
 }
 

@@ -27,6 +27,7 @@
     "tsx": "^4.19.0"
   },
   "devDependencies": {
+    "@tanstack/react-query-devtools": "^5.53.1",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

@@ -8,7 +8,6 @@ import {
 } from "@tanstack/react-query";
 
 export default async function ProjectsIndexPage() {
-  // const projectsPromise = getProjectsAction();
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery({

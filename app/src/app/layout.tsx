@@ -5,6 +5,8 @@ import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
 import { Notifications } from "@mantine/notifications";
 import QueryProvider from "@/lib/QueryProvider";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+
 export const metadata: Metadata = {
   title: "Platypus",
   description: "Platypus platform",
@@ -24,6 +26,7 @@ export default function RootLayout({
         <MantineProvider>
           <Notifications />
           <QueryProvider>
+            <ReactQueryDevtools initialIsOpen={false} />
             <ModalsProvider>{children}</ModalsProvider>
           </QueryProvider>
         </MantineProvider>

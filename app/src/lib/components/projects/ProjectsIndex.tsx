@@ -1,27 +1,23 @@
 "use client";
 
-import { getProjectsAction } from "@/lib/actions/actions";
+import { getProjectsAction, deleteProjectAction } from "@/lib/actions/actions";
 import CreateNewProjectButton from "@/lib/components/projects/CreateNewProjectButton";
-import { deleteProject } from "@/lib/db/main";
 import { Button } from "@mantine/core";
 import Link from "next/link";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { notifications } from "@mantine/notifications";
 
 const ProjectsIndex = () => {
-  const queryClient = useQueryClient();
+  const { data: projects, isLoading } = useQuery({
+    queryKey: ["projects"],
+    queryFn: getProjectsAction,
+  });
 
-  const { data: projects, isLoading } = useQuery(
-    {
-      queryKey: ["projects"],
-      queryFn: getProjectsAction,
-    },
-    queryClient
-  );
-
-  // docs hint: make sure to still call revalidatePath inside the mutationFn!
+  // docs hint: make sure to still call revalidatePath inside the mutationFn to
+  // so the projects get re-fetched (it somehow magically works without having
+  // to invalidate the query manually)
   const deleteProjectMutation = useMutation({
-    mutationFn: deleteProject,
+    mutationFn: deleteProjectAction,
     onSuccess: () => {
       notifications.show({
         title: "Project deleted",

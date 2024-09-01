@@ -1,21 +1,22 @@
 "use client";
 
 import { getProjectAction } from "@/lib/actions/actions";
-import { use, useState } from "react";
 import TargetQuestionForm from "./TargetQuestionForm";
+import { useQuery } from "@tanstack/react-query";
 
-const ProjectDetail = ({
-  projectPromise,
-}: {
-  projectPromise: ReturnType<typeof getProjectAction>;
-}) => {
-  const project = use(projectPromise);
+const ProjectDetail = ({ projectId }: { projectId: string }) => {
+  const { data: project, isLoading } = useQuery({
+    queryKey: ["project", projectId],
+    queryFn: () => getProjectAction(projectId),
+  });
+
+  if (isLoading) {
+    return <div>Loading project...</div>;
+  }
 
   if (!project) {
     return <div>Project not found</div>;
   }
-
-  const [content, setContent] = useState(project.content);
 
   return (
     <div className="flex flex-col gap-4">
@@ -26,14 +27,10 @@ const ProjectDetail = ({
           created_at: {project.created_at}
         </div>
       </div>
-      <TargetQuestionForm
-        projectId={project.id}
-        content={content}
-        setContent={setContent}
-      />
+      <TargetQuestionForm projectId={project.id} />
       <span>Content</span>
       <pre className="bg-gray-100 p-4 rounded-md">
-        {JSON.stringify(content, null, 2)}
+        {JSON.stringify(project.content, null, 2)}
       </pre>
     </div>
   );
