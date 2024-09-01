@@ -100,7 +100,6 @@ export async function updateProject(
 
 export async function deleteProject(id: ProjectId) {
   db = await getDb();
-  return { error: "test" };
   await db.run("DELETE FROM projects WHERE id = ?", id);
   revalidatePath("/projects");
   revalidatePath(`/projects/${id}`);

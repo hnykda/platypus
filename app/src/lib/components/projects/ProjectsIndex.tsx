@@ -6,7 +6,7 @@ import { deleteProject } from "@/lib/db/main";
 import { Button } from "@mantine/core";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ProjectId } from "@/lib/db/types";
+import { notifications } from "@mantine/notifications";
 
 const ProjectsIndex = () => {
   const queryClient = useQueryClient();
@@ -19,20 +19,22 @@ const ProjectsIndex = () => {
     queryClient
   );
 
+  // docs hint: make sure to still call revalidatePath inside the mutationFn!
   const deleteProjectMutation = useMutation({
-    mutationFn: async (id: ProjectId) => {
-      try {
-        const result = await deleteProject(id);
-        if (result.error) {
-          throw new Error(result.error);
-        }
-      } catch (error) {
-        console.log("An error occurred while deleting the project");
-        throw error;
-      }
+    mutationFn: deleteProject,
+    onSuccess: () => {
+      notifications.show({
+        title: "Project deleted",
+        message: "The project has been deleted",
+        color: "green",
+      });
     },
-    onError: (error) => {
-      console.error("handler", error);
+    onError: (error, variables) => {
+      notifications.show({
+        title: `We couldn't delete the project '${variables}'`,
+        message: error.message,
+        color: "red",
+      });
     },
   });
 
