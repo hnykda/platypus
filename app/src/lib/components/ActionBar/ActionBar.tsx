@@ -14,7 +14,7 @@ import { IconBulb, IconSearch } from "@tabler/icons-react";
 import classes from "./ActionBar.module.css";
 import { TaskStatus } from "@/lib/db/types";
 import { useTasks } from "@/lib/hooks/useTasks";
-import { TaskNames } from "@/lib/db/tasks";
+import { TaskNames, TaskRegistry } from "@/lib/db/tasks";
 import { modals } from "@mantine/modals";
 
 const links = [
@@ -124,7 +124,8 @@ export function ActionBar({ projectId }: { projectId: string }) {
               >
                 <div className="flex flex-col justify-between">
                   Status: {task.status}
-                  {task.status === TaskStatus.COMPLETED ? (
+                  {task.status === TaskStatus.COMPLETED &&
+                  TaskRegistry[task.task_name].supportsAction ? (
                     <Button
                       onClick={() => {
                         activateTask(task.id);

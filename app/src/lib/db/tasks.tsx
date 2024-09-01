@@ -1,4 +1,3 @@
-import EvidenceModal from "../components/EvidenceModal";
 
 const sleepTime = 4000;
 const sleep = async () => {
@@ -64,37 +63,33 @@ export const TaskRegistry: Record<
     description: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     func: (...args: any[]) => any;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resultView: React.FC<{ result: any }>;
+    // if true, the task can be "Activated", which means its results will take an effect
+    supportsAction: boolean;
   }
 > = {
   [TaskNames.VALIDATE_QUESTION]: {
     name: TaskNames.VALIDATE_QUESTION,
     description: "Validate the question",
     func: validateQuestion,
-    resultView: ({ result }) => <div>{JSON.stringify(result)}</div>,
+    supportsAction: false,
   },
   [TaskNames.CLASSIFY_QUESTION]: {
     name: TaskNames.CLASSIFY_QUESTION,
     description: "Classify the question",
     func: classifyQuestion,
-    resultView: ({ result }) => <div>{JSON.stringify(result)}</div>,
+    supportsAction: false,
   },
   [TaskNames.IMPROVE_QUESTION]: {
     name: TaskNames.IMPROVE_QUESTION,
     description: "Improve the question",
     func: improveQuestion,
-    resultView: ({ result }) => <div>{JSON.stringify(result)}</div>,
+    supportsAction: false,
   },
   [TaskNames.SEARCH_FOR_EVIDENCE]: {
     name: TaskNames.SEARCH_FOR_EVIDENCE,
     description: "Search for evidence",
     func: searchForEvidence,
-    resultView: ({
-      result,
-    }: {
-      result: Awaited<ReturnType<typeof searchForEvidence>>;
-    }) => <EvidenceModal evidence={result.evidence} />,
+    supportsAction: true,
   },
 };
 
