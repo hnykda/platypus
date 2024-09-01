@@ -15,8 +15,6 @@ import classes from "./ActionBar.module.css";
 import { TaskStatus } from "@/lib/db/types";
 import { useTasks } from "@/lib/hooks/useTasks";
 import { TaskNames } from "@/lib/db/tasks";
-import { useQuery } from "@tanstack/react-query";
-import { getProjectTasksAction } from "@/lib/actions/actions";
 
 const links = [
   {
@@ -32,12 +30,7 @@ const links = [
 ];
 
 export function ActionBar({ projectId }: { projectId: string }) {
-  const { deleteAllTasks, spawnTask } = useTasks(projectId);
-
-  const { data: projectTasks } = useQuery({
-    queryKey: ["tasks", projectId],
-    queryFn: () => getProjectTasksAction(projectId),
-  });
+  const { tasks, deleteAllTasks, spawnTask } = useTasks(projectId);
 
   const mainLinks = links.map((link) => (
     <UnstyledButton
@@ -84,7 +77,7 @@ export function ActionBar({ projectId }: { projectId: string }) {
           <Text size="lg" fw={500} mb="md">
             Tasks
           </Text>
-          {projectTasks?.length === 0 ? (
+          {tasks?.length === 0 ? (
             <Text size="sm" c="dimmed">
               No tasks found
             </Text>
@@ -98,7 +91,7 @@ export function ActionBar({ projectId }: { projectId: string }) {
             </Button>
           )}
           <ScrollArea mt="md">
-            {projectTasks?.map((task) => (
+            {tasks?.map((task) => (
               <Notification
                 key={task.id}
                 title={task.task_name}
