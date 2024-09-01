@@ -4,6 +4,7 @@ import "./globals.css";
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
 import { Notifications } from "@mantine/notifications";
+import QueryProvider from "@/lib/QueryProvider";
 export const metadata: Metadata = {
   title: "Platypus",
   description: "Platypus platform",
@@ -22,7 +23,9 @@ export default function RootLayout({
       <body>
         <MantineProvider>
           <Notifications />
-          <ModalsProvider>{children}</ModalsProvider>
+          <QueryProvider>
+            <ModalsProvider>{children}</ModalsProvider>
+          </QueryProvider>
         </MantineProvider>
       </body>
     </html>

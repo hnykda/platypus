@@ -5,15 +5,44 @@ import CreateNewProjectButton from "@/lib/components/projects/CreateNewProjectBu
 import { deleteProject } from "@/lib/db/main";
 import { Button } from "@mantine/core";
 import Link from "next/link";
-import { use, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ProjectId } from "@/lib/db/types";
 
-const ProjectsIndex = ({
-  projectsPromise,
-}: {
-  projectsPromise: ReturnType<typeof getProjectsAction>;
-}) => {
-  const projectsInitial = use(projectsPromise);
-  const [projects, setProjects] = useState(projectsInitial);
+const ProjectsIndex = () => {
+  const queryClient = useQueryClient();
+
+  const { data: projects, isLoading } = useQuery(
+    {
+      queryKey: ["projects"],
+      queryFn: getProjectsAction,
+    },
+    queryClient
+  );
+
+  const deleteProjectMutation = useMutation({
+    mutationFn: async (id: ProjectId) => {
+      try {
+        const result = await deleteProject(id);
+        if (result.error) {
+          throw new Error(result.error);
+        }
+      } catch (error) {
+        console.log("An error occurred while deleting the project");
+        throw error;
+      }
+    },
+    onError: (error) => {
+      console.error("handler", error);
+    },
+  });
+
+  if (isLoading) {
+    return <div>Loading projects...</div>;
+  }
+
+  if (!projects) {
+    return <div>No projects found</div>;
+  }
 
   return (
     <div className="flex flex-col gap-4 text-3xl">
@@ -27,8 +56,7 @@ const ProjectsIndex = ({
             variant="outline"
             color="red"
             onClick={() => {
-              setProjects(projects.filter((p) => p.id !== project.id));
-              deleteProject(project.id);
+              deleteProjectMutation.mutate(project.id);
             }}
           >
             Delete

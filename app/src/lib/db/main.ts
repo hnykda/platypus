@@ -1,4 +1,5 @@
 "use server";
+
 import sqlite3 from "sqlite3";
 import { open } from "sqlite";
 import fs from "fs";
@@ -7,6 +8,7 @@ import { TaskFunctions, TaskName } from "./tasks";
 import { ProjectId, Project, Content, TaskStatus, Task } from "./types";
 import { Queue } from "bullmq";
 import { REDIS_HOST, REDIS_PORT } from "../constants";
+import { revalidatePath } from "next/cache";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let db: any = null;
@@ -73,6 +75,9 @@ export async function getProjects(): Promise<Project[]> {
 export async function getProject(id: ProjectId): Promise<Project | null> {
   db = await getDb();
   const rawRecord = await db.get("SELECT * FROM projects WHERE id = ?", id);
+  if (!rawRecord) {
+    return null;
+  }
   return {
     ...rawRecord,
     content: JSON.parse(rawRecord.content) as Content,
@@ -95,7 +100,10 @@ export async function updateProject(
 
 export async function deleteProject(id: ProjectId) {
   db = await getDb();
+  return { error: "test" };
   await db.run("DELETE FROM projects WHERE id = ?", id);
+  revalidatePath("/projects");
+  revalidatePath(`/projects/${id}`);
 }
 
 async function createDbTask<T extends TaskName>(

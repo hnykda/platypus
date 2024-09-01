@@ -1,16 +1,26 @@
 import { getProjectsAction } from "@/lib/actions/actions";
 import DefaultPage from "@/lib/components/DefaultPage";
 import ProjectsIndex from "@/lib/components/projects/ProjectsIndex";
-import { Suspense } from "react";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
 
 export default async function ProjectsIndexPage() {
-  const projectsPromise = getProjectsAction();
+  // const projectsPromise = getProjectsAction();
+  const queryClient = new QueryClient();
+
+  await queryClient.prefetchQuery({
+    queryKey: ["projects"],
+    queryFn: getProjectsAction,
+  });
 
   return (
     <DefaultPage>
-      <Suspense fallback={<div>Loading projects...</div>}>
-        <ProjectsIndex projectsPromise={projectsPromise} />
-      </Suspense>
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <ProjectsIndex />
+      </HydrationBoundary>
     </DefaultPage>
   );
 }
