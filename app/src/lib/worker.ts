@@ -20,9 +20,8 @@ const worker = new Worker(
 
     const taskFunc = taskSpec.func;
     const args = job.data.args;
-    // @ts-expect-error - typescript complains even though this works
     const result = await taskFunc(...args);
-    job.updateData(result);
+    await job.updateData({ ...job.data, __result: result });
   },
   {
     connection: {
@@ -47,7 +46,7 @@ const afterJob = async (job: Job, status: TaskStatus, error: string) => {
       taskId: job.id,
       status,
       error,
-      result: JSON.stringify(job.data.result),
+      result: JSON.stringify(job.data.__result),
       finishedAt: new Date().toISOString(),
     });
   } else {

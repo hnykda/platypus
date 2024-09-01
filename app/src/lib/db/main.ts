@@ -4,7 +4,6 @@ import { open } from "sqlite";
 import fs from "fs";
 import path from "path";
 import { TaskFunctions, TaskName } from "./tasks";
-import { generateId } from "../utils";
 import { ProjectId, Project, Content, TaskStatus, Task } from "./types";
 import { Queue } from "bullmq";
 import { REDIS_HOST, REDIS_PORT } from "../constants";
@@ -27,7 +26,7 @@ const initializeDb = async () => {
         name TEXT DEFAULT '',
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         content TEXT DEFAULT '{}'
-      )
+      );
 
       CREATE TABLE IF NOT EXISTS tasks (
         id TEXT PRIMARY KEY,
@@ -40,7 +39,7 @@ const initializeDb = async () => {
         finished_at TEXT DEFAULT '',
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT DEFAULT CURRENT_TIMESTAMP
-      )
+      );
     `);
   }
 };
@@ -116,11 +115,11 @@ async function createDbTask<T extends TaskName>(
 }
 
 export async function spawnTask<T extends TaskName>(
+  taskId: string,
   projectId: ProjectId,
   taskName: T,
   funcArgs: Parameters<TaskFunctions[T]>
 ): Promise<{ spawned: true; taskId: string }> {
-  const taskId = generateId();
   createDbTask(taskId, projectId, taskName, funcArgs);
 
   const alphaQueue = new Queue("alpha", {
@@ -174,4 +173,9 @@ export async function updateTask({
     finishedAt,
     taskId
   );
+}
+
+export async function deleteAllTasks(projectId: ProjectId) {
+  db = await getDb();
+  await db.run("DELETE FROM tasks WHERE project_id = ?", projectId);
 }

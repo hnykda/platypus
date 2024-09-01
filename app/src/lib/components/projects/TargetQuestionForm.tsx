@@ -31,10 +31,17 @@ const TargetQuestionForm: React.FC<TargetQuestionFormProps> = ({
     spawnTask(TaskNames.IMPROVE_QUESTION, [
       { question: targetQuestion, otherArg: "otherArg" },
     ]);
+    spawnTask(TaskNames.VALIDATE_QUESTION, [{ question: targetQuestion }]);
     notifications.show({
       title: "Checking if we can improve the question",
       message: "We will let you know if we can improve the question.",
     });
+    setTimeout(() => {
+      notifications.show({
+        title: "Validating question",
+        message: "We are validating if the question is specific enough.",
+      });
+    }, 3000);
   };
 
   const handleSubmit = (question: string) => {

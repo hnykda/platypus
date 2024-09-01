@@ -9,31 +9,46 @@ import {
   rem,
   Notification,
   ScrollArea,
+  Button,
 } from "@mantine/core";
-import {
-  IconBulb,
-  IconSearch,
-} from "@tabler/icons-react";
+import { IconBulb, IconSearch } from "@tabler/icons-react";
 import classes from "./ActionBar.module.css";
 import { TaskStatus } from "@/lib/db/types";
 import { useTasks } from "@/lib/hooks/useTasks";
+import { TaskNames } from "@/lib/db/tasks";
 
-const links = [{ icon: IconBulb, label: "Improve Question", notifications: 3 }];
+const links = [
+  {
+    icon: IconBulb,
+    label: "Improve Question",
+    taskName: TaskNames.IMPROVE_QUESTION,
+  },
+  {
+    icon: IconSearch,
+    label: "Search for Evidence",
+    taskName: TaskNames.SEARCH_FOR_EVIDENCE,
+  },
+];
 
 export function ActionBar({ projectId }: { projectId: string }) {
-  const { projectTasks } = useTasks(projectId);
+  const { projectTasks, deleteAllTasks, spawnTask } = useTasks(projectId);
 
   const mainLinks = links.map((link) => (
-    <UnstyledButton key={link.label} className={classes.mainLink}>
+    <UnstyledButton
+      key={link.label}
+      className={classes.mainLink}
+      onClick={() => {
+        // this won't work when tasks become more complex and receive more than just one argument
+        // but solvable...
+        spawnTask(link.taskName, [
+          { question: "What is the meaning of life?" },
+        ]);
+      }}
+    >
       <div className={classes.mainLinkInner}>
         <link.icon size={20} className={classes.mainLinkIcon} stroke={1.5} />
         <span>{link.label}</span>
       </div>
-      {link.notifications && (
-        <Badge size="sm" variant="filled" className={classes.mainLinkBadge}>
-          {link.notifications}
-        </Badge>
-      )}
     </UnstyledButton>
   ));
 
@@ -63,6 +78,19 @@ export function ActionBar({ projectId }: { projectId: string }) {
           <Text size="lg" fw={500} mb="md">
             Tasks
           </Text>
+          {projectTasks.length === 0 ? (
+            <Text size="sm" c="dimmed">
+              No tasks found
+            </Text>
+          ) : (
+            <Button
+              onClick={() => {
+                deleteAllTasks();
+              }}
+            >
+              Delete All
+            </Button>
+          )}
           <ScrollArea mt="md">
             {projectTasks.map((task) => (
               <Notification

@@ -1,7 +1,12 @@
 import { useState, useEffect } from "react";
-import { getTasks, spawnTask as spawnTaskDb } from "@/lib/db/main";
+import {
+  deleteAllTasks as deleteAllTasksDb,
+  getTasks,
+  spawnTask as spawnTaskDb,
+} from "@/lib/db/main";
 import { TaskName, TaskFunctions } from "@/lib/db/tasks";
-import { ProjectId, Task } from "@/lib/db/types";
+import { ProjectId, Task, TaskStatus } from "@/lib/db/types";
+import { generateId } from "../utils";
 
 export function useTasks(projectId: ProjectId) {
   const [projectTasks, setProjectTasks] = useState<Task[]>([]);
@@ -22,10 +27,26 @@ export function useTasks(projectId: ProjectId) {
     taskName: T,
     funcArgs: Parameters<TaskFunctions[T]>
   ) => {
-    await spawnTaskDb(projectId, taskName, funcArgs);
-    // Refresh tasks immediately after spawning a new one
+    const newTaskId = generateId();
+    // optimistic update
+    setProjectTasks((prevTasks) => [
+      {
+        id: newTaskId,
+        task_name: taskName,
+        status: TaskStatus.PENDING,
+        project_id: projectId,
+        func_args: "",
+      },
+      ...prevTasks,
+    ]);
+    await spawnTaskDb(newTaskId, projectId, taskName, funcArgs);
     fetchTasks();
   };
 
-  return { projectTasks, spawnTask };
+  const deleteAllTasks = async () => {
+    setProjectTasks([]);
+    await deleteAllTasksDb(projectId);
+  };
+
+  return { projectTasks, spawnTask, deleteAllTasks };
 }
