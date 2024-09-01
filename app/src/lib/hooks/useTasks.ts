@@ -6,15 +6,12 @@ import { TaskName, TaskFunctions } from "@/lib/db/tasks";
 import { ProjectId } from "@/lib/db/types";
 import { generateId } from "../utils";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { getProjectTasksAction } from "@/lib/actions/actions";
+import { getTasksQueryOptions } from "../queries";
 
 export function useTasks(projectId: ProjectId) {
   const queryClient = useQueryClient();
 
-  const { data: tasks } = useQuery({
-    queryKey: ["tasks", projectId],
-    queryFn: () => getProjectTasksAction(projectId),
-  });
+  const { data: tasks } = useQuery(getTasksQueryOptions(projectId));
 
   const addNewTaskMutation = useMutation({
     mutationFn: async ({

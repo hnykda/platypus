@@ -1,5 +1,5 @@
 import { Job, Worker } from "bullmq";
-import { updateTask } from "./db/main";
+import { updateTask, updateTaskStatus } from "./db/main";
 import { TaskStatus } from "./db/types";
 import { TaskName, TaskRegistry } from "./db/tasks";
 import { REDIS_HOST, REDIS_PORT } from "./constants";
@@ -12,6 +12,8 @@ console.log("Worker starting, ", {
 const worker = new Worker(
   "alpha",
   async (job) => {
+    await updateTaskStatus(job.id!, TaskStatus.RUNNING);
+
     const taskSpec = TaskRegistry[job.name as TaskName];
 
     if (!taskSpec) {
@@ -42,12 +44,11 @@ const worker = new Worker(
 const afterJob = async (job: Job, status: TaskStatus, error: string) => {
   console.log(`${job.id} has ${status}!`);
   if (job.id) {
-    updateTask({
-      taskId: job.id,
+    updateTask(job.id, {
       status,
       error,
       result: JSON.stringify(job.data.__result),
-      finishedAt: new Date().toISOString(),
+      finished_at: new Date().toISOString(),
     });
   } else {
     console.log("Job id is undefined");

@@ -57,8 +57,6 @@ export function ActionBar({ projectId }: { projectId: string }) {
     const task = tasks.find((task) => task.id === taskId);
     if (!task) return;
 
-    console.log("task", task);
-
     modals.openContextModal({
       modal: task.task_name,
       title: "Test modal from context for task" + task.task_name,
@@ -118,6 +116,8 @@ export function ActionBar({ projectId }: { projectId: string }) {
                     ? "blue"
                     : task.status === TaskStatus.COMPLETED
                     ? "green"
+                    : task.status === TaskStatus.RUNNING
+                    ? "blue"
                     : "red"
                 }
                 mb="xs"
@@ -133,7 +133,7 @@ export function ActionBar({ projectId }: { projectId: string }) {
                       variant="outline"
                       size="xs"
                     >
-                      Activate
+                      Apply Results
                     </Button>
                   ) : null}
                 </div>

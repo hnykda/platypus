@@ -42,6 +42,7 @@ export async function updateProjectAction(
 }
 
 export async function getProjectTasksAction(id: ProjectId) {
+  // revalidatePath(`/projects/${id}`);
   return getTasks(id);
 }
 

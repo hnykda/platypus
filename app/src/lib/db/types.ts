@@ -18,6 +18,7 @@ export enum TaskStatus {
   IN_PROGRESS = "in_progress",
   COMPLETED = "completed",
   FAILED = "failed",
+  RUNNING = "running",
 }
 
 export type Task = {
@@ -28,4 +29,6 @@ export type Task = {
   status: TaskStatus;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   result?: any;
+  error?: string;
+  finished_at?: string;
 };

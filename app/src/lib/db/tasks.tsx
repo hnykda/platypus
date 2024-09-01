@@ -1,8 +1,9 @@
+const sleepTime = 10000;
 
-const sleepTime = 4000;
 const sleep = async () => {
   await new Promise((resolve) => setTimeout(resolve, sleepTime));
 };
+
 const validateQuestion = async ({ question }: { question: string }) => {
   await sleep();
 

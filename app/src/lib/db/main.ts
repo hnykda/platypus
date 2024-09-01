@@ -166,28 +166,24 @@ export async function getTasks(projectId: ProjectId): Promise<Task[]> {
   }));
 }
 
-export async function updateTask({
-  taskId,
-  status,
-  error,
-  result,
-  finishedAt,
-}: {
-  taskId: string;
-  status: TaskStatus;
-  error: string;
-  result: string;
-  finishedAt: string;
-}): Promise<void> {
+export async function updateTask(
+  taskId: string,
+  data: Partial<Task>
+): Promise<void> {
   db = await getDb();
   await db.run(
     "UPDATE tasks SET status = ?, error = ?, result = ?, finished_at = ? WHERE id = ?",
-    status,
-    error,
-    result,
-    finishedAt,
+    data.status,
+    data.error,
+    data.result,
+    data.finished_at,
     taskId
   );
+}
+
+export async function updateTaskStatus(taskId: string, status: TaskStatus) {
+  db = await getDb();
+  await db.run("UPDATE tasks SET status = ? WHERE id = ?", status, taskId);
 }
 
 export async function deleteAllTasks(projectId: ProjectId) {

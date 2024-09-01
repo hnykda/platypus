@@ -1,14 +1,13 @@
 "use client";
 
-import { getProjectAction } from "@/lib/actions/actions";
 import TargetQuestionForm from "./TargetQuestionForm";
 import { useQuery } from "@tanstack/react-query";
+import { getProjectQueryOptions } from "@/lib/queries";
 
 const ProjectDetail = ({ projectId }: { projectId: string }) => {
-  const { data: project, isLoading } = useQuery({
-    queryKey: ["project", projectId],
-    queryFn: () => getProjectAction(projectId),
-  });
+  const { data: project, isLoading } = useQuery(
+    getProjectQueryOptions(projectId)
+  );
 
   if (isLoading) {
     return <div>Loading project...</div>;
