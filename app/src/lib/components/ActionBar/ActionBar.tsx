@@ -15,6 +15,7 @@ import classes from "./ActionBar.module.css";
 import { TaskStatus } from "@/lib/db/types";
 import { useTasks } from "@/lib/hooks/useTasks";
 import { TaskNames } from "@/lib/db/tasks";
+import { modals } from "@mantine/modals";
 
 const links = [
   {
@@ -50,6 +51,23 @@ export function ActionBar({ projectId }: { projectId: string }) {
       </div>
     </UnstyledButton>
   ));
+
+  const activateTask = (taskId: string) => {
+    if (!tasks) return;
+    const task = tasks.find((task) => task.id === taskId);
+    if (!task) return;
+
+    console.log("task", task);
+
+    modals.openContextModal({
+      modal: task.task_name,
+      title: "Test modal from context for task" + task.task_name,
+      innerProps: {
+        modalBody: "Test modal from context for task" + task.task_name,
+        result: task.result,
+      },
+    });
+  };
 
   return (
     <>
@@ -104,7 +122,20 @@ export function ActionBar({ projectId }: { projectId: string }) {
                 }
                 mb="xs"
               >
-                Status: {task.status}
+                <div className="flex flex-col justify-between">
+                  Status: {task.status}
+                  {task.status === TaskStatus.COMPLETED ? (
+                    <Button
+                      onClick={() => {
+                        activateTask(task.id);
+                      }}
+                      variant="outline"
+                      size="xs"
+                    >
+                      Activate
+                    </Button>
+                  ) : null}
+                </div>
               </Notification>
             ))}
           </ScrollArea>

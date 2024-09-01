@@ -42,7 +42,6 @@ export async function updateProjectAction(
 }
 
 export async function getProjectTasksAction(id: ProjectId) {
-  console.log("getProjectTasksAction", id);
   return getTasks(id);
 }
 

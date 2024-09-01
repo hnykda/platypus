@@ -1,3 +1,5 @@
+import EvidenceModal from "../components/EvidenceModal";
+
 const sleepTime = 4000;
 const sleep = async () => {
   await new Promise((resolve) => setTimeout(resolve, sleepTime));
@@ -88,7 +90,11 @@ export const TaskRegistry: Record<
     name: TaskNames.SEARCH_FOR_EVIDENCE,
     description: "Search for evidence",
     func: searchForEvidence,
-    resultView: ({ result }) => <div>{JSON.stringify(result)}</div>,
+    resultView: ({
+      result,
+    }: {
+      result: Awaited<ReturnType<typeof searchForEvidence>>;
+    }) => <EvidenceModal evidence={result.evidence} />,
   },
 };
 

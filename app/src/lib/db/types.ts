@@ -26,4 +26,6 @@ export type Task = {
   task_name: TaskName;
   func_args: string;
   status: TaskStatus;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  result?: any;
 };

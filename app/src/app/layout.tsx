@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
-import { ModalsProvider } from "@mantine/modals";
 import { Notifications } from "@mantine/notifications";
 import QueryProvider from "@/lib/QueryProvider";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -27,7 +26,8 @@ export default function RootLayout({
           <Notifications />
           <QueryProvider>
             <ReactQueryDevtools initialIsOpen={false} />
-            <ModalsProvider>{children}</ModalsProvider>
+
+            {children}
           </QueryProvider>
         </MantineProvider>
       </body>

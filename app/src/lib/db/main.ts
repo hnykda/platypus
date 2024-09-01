@@ -154,10 +154,16 @@ export async function spawnTask<T extends TaskName>(
 
 export async function getTasks(projectId: ProjectId): Promise<Task[]> {
   db = await getDb();
-  return db.all(
+  const tasks = await db.all(
     "SELECT * FROM tasks WHERE project_id = ? ORDER BY created_at DESC",
     projectId
   );
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return tasks.map((task: any) => ({
+    ...task,
+    func_args: JSON.parse(task.func_args),
+    result: task.result ? JSON.parse(task.result) : null,
+  }));
 }
 
 export async function updateTask({
