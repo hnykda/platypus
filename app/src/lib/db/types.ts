@@ -2,8 +2,15 @@ import { TaskName } from "./tasks";
 
 export type ProjectId = string;
 
+export type Evidence = {
+  id: string;
+  content: string;
+  created_at: string;
+};
+
 export type Content = {
   targetQuestion: string;
+  evidence: Evidence[];
 };
 
 export type Project = {

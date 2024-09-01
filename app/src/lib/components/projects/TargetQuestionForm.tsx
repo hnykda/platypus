@@ -6,7 +6,7 @@ import { notifications } from "@mantine/notifications";
 import { TaskNames } from "@/lib/db/tasks";
 import { useTasks } from "@/lib/hooks/useTasks";
 import { getProjectAction, updateProjectAction } from "@/lib/actions/actions";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 interface TargetQuestionFormProps {
   projectId: ProjectId;
@@ -15,14 +15,17 @@ interface TargetQuestionFormProps {
 const TargetQuestionForm: React.FC<TargetQuestionFormProps> = ({
   projectId,
 }) => {
+  const queryClient = useQueryClient();
   const { data: project } = useQuery({
     queryKey: ["project", projectId],
     queryFn: () => getProjectAction(projectId),
   });
 
   const updateProjectMutation = useMutation({
-    mutationFn: (data: Partial<Project>) =>
-      updateProjectAction(projectId, data),
+    mutationFn: async (data: Partial<Project>) => {
+      await updateProjectAction(projectId, data);
+      queryClient.invalidateQueries({ queryKey: ["project", projectId] });
+    },
     onSuccess: () => {
       notifications.show({
         title: "Project data updated",
@@ -51,7 +54,7 @@ const TargetQuestionForm: React.FC<TargetQuestionFormProps> = ({
   const { spawnTask } = useTasks(projectId);
 
   useEffect(() => {
-    if (content.targetQuestion === null) {
+    if (!content.targetQuestion) {
       open();
     }
   }, [content.targetQuestion]);
@@ -97,9 +100,9 @@ const TargetQuestionForm: React.FC<TargetQuestionFormProps> = ({
   return (
     <div>
       {content.targetQuestion !== null && content.targetQuestion !== "" && (
-        <div>
-          <h3>Target Question:</h3>
-          <p>{content.targetQuestion}</p>
+        <div className="flex flex-row gap-2">
+          <span className="font-bold">Target Question:</span>
+          <span>{content.targetQuestion}</span>
           <Button onClick={open}>Edit Question</Button>
         </div>
       )}
@@ -115,7 +118,7 @@ const TargetQuestionForm: React.FC<TargetQuestionFormProps> = ({
             }
           }}
         />
-        <div className="flex gap-2">
+        <div className="flex gap-2 mt-2">
           <Button onClick={() => handleSubmit(targetQuestion)}>Submit</Button>
           <Button onClick={handleCancel}>Cancel</Button>
         </div>

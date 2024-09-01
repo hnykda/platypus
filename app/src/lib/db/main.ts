@@ -5,7 +5,14 @@ import { open } from "sqlite";
 import fs from "fs";
 import path from "path";
 import { TaskFunctions, TaskName } from "./tasks";
-import { ProjectId, Project, Content, TaskStatus, Task } from "./types";
+import {
+  ProjectId,
+  Project,
+  Content,
+  TaskStatus,
+  Task,
+  Evidence,
+} from "./types";
 import { Queue } from "bullmq";
 import { REDIS_HOST, REDIS_PORT } from "../constants";
 import { revalidatePath } from "next/cache";
@@ -189,4 +196,52 @@ export async function updateTaskStatus(taskId: string, status: TaskStatus) {
 export async function deleteAllTasks(projectId: ProjectId) {
   db = await getDb();
   await db.run("DELETE FROM tasks WHERE project_id = ?", projectId);
+}
+
+export async function getProjectEvidence(projectId: ProjectId) {
+  const project = await getProject(projectId);
+  if (!project || !project.content || !project.content.evidence) {
+    return [];
+  }
+  return project.content.evidence;
+}
+
+export async function addProjectEvidence(
+  projectId: ProjectId,
+  evidence: Evidence[]
+) {
+  const project = await getProject(projectId);
+  if (!project || !project.content) {
+    return;
+  }
+  const newEvidence = [...(project.content.evidence || []), ...evidence];
+  await updateProject(projectId, {
+    content: { ...project.content, evidence: newEvidence },
+  });
+}
+
+export async function deleteProjectEvidence(
+  projectId: ProjectId,
+  evidenceId: string
+) {
+  const project = await getProject(projectId);
+  if (!project || !project.content) {
+    return;
+  }
+  const newEvidence = project.content.evidence.filter(
+    (evidence) => evidence.id !== evidenceId
+  );
+  await updateProject(projectId, {
+    content: { ...project.content, evidence: newEvidence },
+  });
+}
+
+export async function deleteAllEvidence(projectId: ProjectId) {
+  const project = await getProject(projectId);
+  if (!project || !project.content) {
+    return;
+  }
+  await updateProject(projectId, {
+    content: { ...project.content, evidence: [] },
+  });
 }

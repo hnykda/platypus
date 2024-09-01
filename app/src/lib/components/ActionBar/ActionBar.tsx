@@ -63,6 +63,7 @@ export function ActionBar({ projectId }: { projectId: string }) {
       innerProps: {
         modalBody: "Test modal from context for task" + task.task_name,
         result: task.result,
+        projectId,
       },
     });
   };

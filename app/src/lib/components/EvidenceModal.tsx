@@ -3,18 +3,23 @@
 import { Button, Text, Switch, List } from "@mantine/core";
 import { ContextModalProps } from "@mantine/modals";
 import { useState } from "react";
+import { addProjectEvidenceAction } from "../actions/actions";
+import { generateId } from "../utils";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const EvidenceModal = ({
   context,
   id,
   innerProps,
 }: ContextModalProps<{
+  projectId: string;
   modalBody: string;
   result: { evidence: string[] };
 }>) => {
   const [selectedEvidence, setSelectedEvidence] = useState<boolean[]>(
     new Array(innerProps.result.evidence.length).fill(true)
   );
+  const queryClient = useQueryClient();
 
   const handleSwitchChange = (index: number) => {
     setSelectedEvidence((prev) => {
@@ -28,8 +33,19 @@ export const EvidenceModal = ({
     const selected = innerProps.result.evidence.filter(
       (_, index) => selectedEvidence[index]
     );
-    console.log("Selected evidence:", selected);
-    // context.closeModal(id);
+    // a variant without mutation, we don't have all the goodies of react query
+    addProjectEvidenceAction(
+      innerProps.projectId,
+      selected.map((item) => ({
+        content: item,
+        id: generateId(),
+        created_at: new Date().toISOString(),
+      }))
+    );
+    queryClient.invalidateQueries({
+      queryKey: ["evidence", innerProps.projectId],
+    });
+    context.closeModal(id);
   };
 
   return (
